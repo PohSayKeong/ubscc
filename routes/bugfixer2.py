@@ -5,28 +5,38 @@ from routes import app
 
 logger = logging.getLogger(__name__)
 
-@app.route('/bugfixer/p2', methods=['POST'])
-def max_bugs_fixed():
+
+def max_bugsfixed(bugseq):
+    # Sort the bugs by their escalation limits
+    bugseq.sort(key=lambda x: x[1])
+
+    # Initialize dp array, where dp[i] is the minimum time to fix i bugs
+    n = len(bugseq)
+    dp = [float("inf")] * (n + 1)  # dp[i] holds the minimum time to complete i bugs
+    dp[0] = 0  # 0 bugs take 0 time
+
+    # Process each bug
+    for difficulty, limit in bugseq:
+        # Traverse dp array in reverse to prevent overwriting during update
+        for i in range(n - 1, -1, -1):
+            # If we can add this bug to the i-th solution without exceeding the limit
+            if dp[i] + difficulty <= limit:
+                dp[i + 1] = min(dp[i + 1], dp[i] + difficulty)
+
+    # The result is the maximum number of bugs that can be fixed
+    for i in range(n, -1, -1):
+        if dp[i] != float("inf"):
+            return i
+    return 0
+
+
+@app.route("/bugfixer/p2", methods=["POST"])
+def max_bugs():
     data = request.json
     results = []
 
     for bug_info in data:
-        bugseq = bug_info['bugseq']
-        
-        # Sort bugs by their limits, and by difficulty if limits are the same
-        bugseq.sort(key=lambda x: (x[1], x[0]))  # Sort by limit first
-
-        current_time = 0
-        count = 0
-        
-        for difficulty, limit in bugseq:
-            if current_time + difficulty <= limit:
-                current_time += difficulty  # Update current time
-                count += 1  # Increment the count of bugs fixed
-
-        results.append(count)
+        bugseq = bug_info["bugseq"]
+        results.append(max_bugsfixed(bugseq))
 
     return jsonify(results)
-
-if __name__ == '__main__':
-    app.run(debug=True)
