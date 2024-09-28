@@ -10,3 +10,4 @@ import routes.bugfixer2
 import routes.klotski
 import routes.dodge
 import routes.digitalcolony
+import routes.riggedDealer
