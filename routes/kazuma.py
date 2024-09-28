@@ -9,26 +9,27 @@ def calculate_efficiency_dp(monsters):
     if n == 0:
         return 0
     elif n == 1:
-        return max(0, monsters[0] - 1)
+        return 0  # Not enough time to prepare and attack
 
-    # DP array to store maximum efficiency up to each time frame
-    dp = [0] * n
+    # DP array to store the maximum efficiency starting from each time frame
+    dp = [0] * (n + 1)
 
-    # Base cases
-    dp[0] = max(0, monsters[0] - 1)
-    if n > 1:
-        dp[1] = max(dp[0], monsters[1] - 1)
+    # Iterate from the end of the time frames to the beginning
+    for i in range(n - 2, -1, -1):
+        # Option 1: Skip this time frame
+        dp[i] = dp[i + 1]
 
-    # Fill DP table using recurrence relation
-    for i in range(2, n):
-        # Option 1: Don't attack at time i, just carry over the previous efficiency
-        dp[i] = dp[i - 1]
+        # Option 2: Prepare circle at i, attack at i+1, and rest at i+2 (if within bounds)
+        if i + 1 < n:
+            # Kazuma pays for preparation at i and attack at i+1
+            profit = (monsters[i + 1]) - monsters[i]
+            if i + 2 < n:
+                dp[i] = max(dp[i], dp[i + 2] + profit)
+            else:
+                dp[i] = max(dp[i], profit)
 
-        # Option 2: Attack at time i, add monsters[i] - 1 and skip the next time frame
-        dp[i] = max(dp[i], dp[i - 2] + (monsters[i] - 1))
-
-    # Return the maximum efficiency at the last time frame
-    return dp[n - 1]
+    # Maximum efficiency is stored in dp[0]
+    return dp[0]
 
 
 @app.route("/efficient-hunter-kazuma", methods=["POST"])
