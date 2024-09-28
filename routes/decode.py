@@ -8,7 +8,7 @@ from routes import app
 logger = logging.getLogger(__name__)
 
 
-@app.route("/ub5-flags", methods=["POST"])
+@app.route("/ub5-flags", methods=["GET"])
 def decode():
     return json.dumps(
         {
