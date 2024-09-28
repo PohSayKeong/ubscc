@@ -53,7 +53,7 @@ def weights(colony, generations):
     return final_weight
 
 
-@app.route("/digitalcolony", methods=["POST"])
+@app.route("/digital-colony", methods=["POST"])
 def digitalcolony():
     data = request.json
     results = []
