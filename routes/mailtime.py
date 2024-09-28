@@ -11,12 +11,18 @@ def get_root_subject(subject):
     return subject.split("RE: ")[-1].strip()
 
 
-def calculate_response_time(email1, email2):
-    sent_time1 = datetime.fromisoformat(email1["timeSent"]).replace(tzinfo=pytz.UTC)
-    sent_time2 = datetime.fromisoformat(email2["timeSent"]).replace(tzinfo=pytz.UTC)
+def calculate_response_time(email1, email2, tz1, tz2):
+    # 2024-01-12T15:00:00+01:00
+    time1 = datetime.fromisoformat(email1["timeSent"])
+    time2 = datetime.fromisoformat(email2["timeSent"])
+    logging.info(f"time1: {time1}, time2: {time2}")
+    logging.info(f"tz1: {tz1}, tz2: {tz2}")
 
-    # Calculate the total seconds between the two timestamps
-    return int((sent_time2 - sent_time1).total_seconds())
+    # Convert time2 to time1's timezone
+    time2 = time2.astimezone(tz1)
+    logging.info(f"time2 converted to tz1: {time2}")
+
+    return (time2 - time1).total_seconds()
 
 
 @app.route("/mailtime", methods=["POST"])
@@ -24,6 +30,8 @@ def mailtime():
     data = request.json
     logging.info("data sent for evaluation {}".format(data))
     emails = data["emails"]
+    users_info = data["users"]
+    users = {user["name"]: user["officeHours"]["timeZone"] for user in users_info}
 
     # Group emails by thread
     threads = defaultdict(list)
@@ -40,10 +48,15 @@ def mailtime():
         for i in range(1, len(thread)):
             email1 = thread[i - 1]
             email2 = thread[i]
+            tz1 = pytz.timezone(users[email1["sender"]])
+            tz2 = pytz.timezone(users[email2["sender"]])
 
             # Calculate response time for the sender of email2
             user_name = email2["sender"]
-            response_time = calculate_response_time(email1, email2)
+            response_time = calculate_response_time(email1, email2, tz1, tz2)
+            logging.info(
+                f"Response time from {email1['sender']} to {email2['sender']}: {response_time} seconds"
+            )
 
             response_times[user_name].append(response_time)
 
