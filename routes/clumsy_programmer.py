@@ -25,7 +25,7 @@ def find_correct_word(mistyped_word, variant_map):
 
 @app.route('/the-clumsy-programmer', methods=['POST'])
 def correct_mistypes():
-    data = request.json
+    data = request.json[:4]
     response = []
 
     for entry in data: 
