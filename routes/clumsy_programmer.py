@@ -17,16 +17,22 @@ def find_correct_word(mistyped_word, dictionary):
 @app.route('/the-clumsy-programmer', methods=['POST'])
 def correct_mistypes():
     data = request.json
-    dictionary = data.get('dictionary', [])
-    mistypes = data.get('mistypes', [])
+    response = []
 
-    corrections = []
-    for mistyped_word in mistypes:
-        corrected_word = find_correct_word(mistyped_word, dictionary)
-        if corrected_word:
-            corrections.append(corrected_word)
+    for entry in data: 
+        dictionary = entry.get('dictionary', [])
 
-    return jsonify({"corrections": corrections})
+        mistypes = entry.get('mistypes', [])
+
+        corrections = []
+        for mistyped_word in mistypes:
+            corrected_word = find_correct_word(mistyped_word, dictionary)
+            if corrected_word:
+                corrections.append(corrected_word)
+
+        response.append({"corrections": corrections})     
+
+    return jsonify(response)
 
 if __name__ == '__main__':
     app.run(debug=True)
