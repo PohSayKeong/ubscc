@@ -19,12 +19,11 @@ def calculate_efficiency_dp(monsters):
         # Option 1: Skip this time frame
         dp[i] = dp[i + 1]
 
-        # Option 2: Prepare circle at i, attack at i+1, and rest at i+2 (if within bounds)
+        # Option 2: Prepare a circle at time i, attack at time i+1, and rest at time i+2
         if i + 1 < n:
-            # Kazuma pays for preparation at i and attack at i+1
-            profit = (monsters[i + 1]) - monsters[i]
-            if i + 2 < n:
-                dp[i] = max(dp[i], dp[i + 2] + profit)
+            profit = monsters[i + 1] - monsters[i]
+            if i + 3 < n:
+                dp[i] = max(dp[i], dp[i + 3] + profit)
             else:
                 dp[i] = max(dp[i], profit)
 
