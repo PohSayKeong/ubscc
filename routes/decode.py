@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 @app.route("/ub5-flags", methods=["GET"])
 def decode():
     response = {
-        "sanityScroll": {"flag": "UB5{dzNsYzBtM183MF9jN2ZfTjB0dHlCMDE=}"},
+        "sanityScroll": {"flag": "UB5{w3lc0m3_70_c7f_N0ttyB01}"},
         "openAiExploration": {"flag": "FLAG_CONTENT_HERE"},
         "dictionaryAttack": {
             "flag": "UB5{FLAG_CONTENT_HERE}",
