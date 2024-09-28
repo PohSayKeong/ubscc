@@ -3,6 +3,12 @@ from flask import Flask, request, jsonify
 from datetime import datetime, timedelta
 import pytz
 from routes import app
+from collections import defaultdict
+
+
+# Helper function to extract the root subject
+def get_root_subject(subject):
+    return subject.split("RE: ")[-1].strip()
 
 
 def calculate_response_time(email1, email2):
@@ -18,25 +24,28 @@ def mailtime():
     data = request.json
     logging.info("data sent for evaluation {}".format(data))
     emails = data["emails"]
-    users = data["users"]
 
-    response_times = {}
+    # Group emails by thread
+    threads = defaultdict(list)
 
-    # Sort emails based on subject and time
-    emails.sort(key=lambda x: x["timeSent"])
+    for email in emails:
+        root_subject = get_root_subject(email["subject"])
+        threads[root_subject].append(email)
 
-    for i in range(1, len(emails)):
-        email1 = emails[i - 1]
-        email2 = emails[i]
+    response_times = defaultdict(list)
 
-        # Calculate response time for the sender of email2
-        user_name = email2["sender"]
-        response_time = calculate_response_time(email1, email2)
+    # Calculate response times for each email in the thread
+    for thread in threads.values():
+        thread.sort(key=lambda x: x["timeSent"])
+        for i in range(1, len(thread)):
+            email1 = thread[i - 1]
+            email2 = thread[i]
 
-        if user_name in response_times:
+            # Calculate response time for the sender of email2
+            user_name = email2["sender"]
+            response_time = calculate_response_time(email1, email2)
+
             response_times[user_name].append(response_time)
-        else:
-            response_times[user_name] = [response_time]
 
     # Calculate average response times per user
     average_times = {
