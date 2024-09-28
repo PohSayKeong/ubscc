@@ -42,7 +42,10 @@ def correct_mistypes():
             if corrected_word:
                 corrections.append(corrected_word)
 
-        response.append({"corrections": corrections})     
+        response.append({"corrections": corrections})
+    response.append(None)
+    response.append(None)     
+     
 
     return jsonify(response)
 
