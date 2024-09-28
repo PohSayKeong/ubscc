@@ -9,3 +9,4 @@ import routes.bugfixer1
 import routes.bugfixer2
 import routes.klotski
 import routes.dodge
+import routes.riggedDealer
