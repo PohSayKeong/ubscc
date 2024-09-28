@@ -136,6 +136,7 @@ def bfs_simulation(grid, player_pos):
 @app.route("/dodge", methods=["POST"])
 def dodge():
     data = request.data
+    logging.info("data sent for evaluation {}".format(data))
     grid = [[x for x in line.decode("utf-8")] for line in data.splitlines()]
 
     # Find player position
