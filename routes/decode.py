@@ -17,7 +17,7 @@ def decode():
             "password": "PASSWORD_HERE",
         },
         "pictureSteganography": {
-            "flagOne": "UB5-1{1_am_d3f_n0t_old}}",
+            "flagOne": "UB5-1{1_am_d3f_n0t_old}",
             "flagTwo": "UB5-2{1amlik3n3w}",
         },
         "reverseEngineeringTheDeal": {
