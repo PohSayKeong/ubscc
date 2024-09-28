@@ -6,7 +6,6 @@ from routes import app
 
 logger = logging.getLogger(__name__)
 
-# Helper function to calculate time within working hours, skipping weekends and after-hours
 def calculate_working_time(start_time, end_time, user):
     tz = pytz.timezone(user['officeHours']['timeZone'])
     local_start = start_time.astimezone(tz)
@@ -37,11 +36,10 @@ def calculate_working_time(start_time, end_time, user):
             break
         else:  # If the end time is after the workday ends, add time until the end of the working day
             total_seconds += (next_work_end - local_start).total_seconds()
-            local_start = next_work_end
+            local_start = next_work_end  # Move to the end of the working day
 
     return total_seconds
 
-# Calculate the response time in seconds
 def calculate_response_time(email1, email2, users):
     sender1 = next(u for u in users if u['name'] == email1['sender'])
     receiver1 = next(u for u in users if u['name'] == email1['receiver'])

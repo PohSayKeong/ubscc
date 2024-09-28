@@ -13,3 +13,5 @@ import routes.digitalcolony
 import routes.riggedDealer
 import routes.mailtime
 import routes.clumsy_programmer
+import routes.taxi
+import routes.tourist
