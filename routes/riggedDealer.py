@@ -2,6 +2,7 @@ import logging
 from flask import Flask, request, jsonify
 from collections import defaultdict, deque
 from routes import app
+
 from collections import Counter
 import random
 
@@ -82,23 +83,45 @@ def rig_deck(round_info):
 
     # Shuffle actions until the winning player has the expected hand strength
     for _ in range(max_actions):
+        round_actions = []
+        
         # Perform a cut and a riffle shuffle
         cut_index = random.randint(1, len(deck) - 1)
         deck = cut_deck(deck, cut_index)
-        actions.append([f'cutAt-{cut_index}'])
+        round_actions.append(f'cutAt-{cut_index}')
         
         deck = riffle_shuffle(deck)
-        actions.append(['shuffle'])
+        round_actions.append('shuffle')
 
         # Deal the cards
         hands = deal_cards(deck, number_of_players, hand_size)
         
         # Check if the winning player has the expected hand strength
         winning_hand_strength = hand_strength(hands[winning_player])
-        if winning_hand_strength[0] == expected_hand_strength:
+        
+        # Check if the expected hand strength matches
+        if winning_hand_strength[0] == (expected_hand_strength_to_value(expected_hand_strength)):
+            actions.append(round_actions)
             break
 
+        actions.append(round_actions)
+
     return actions
+
+def expected_hand_strength_to_value(expected_hand_strength):
+    """Convert expected hand strength from string to value."""
+    hand_strength_map = {
+        "High card": 1,
+        "One pair": 2,
+        "Two pair": 3,
+        "Three of a kind": 4,
+        "Straight": 5,
+        "Flush": 6,
+        "Full house": 7,
+        "Four of a kind": 8,
+        "Straight flush": 9
+    }
+    return hand_strength_map.get(expected_hand_strength)
 
 @app.route('/riggedDealer', methods=['POST'])
 def rigged_dealer():

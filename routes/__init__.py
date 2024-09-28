@@ -11,3 +11,4 @@ import routes.klotski
 import routes.dodge
 import routes.digitalcolony
 import routes.riggedDealer
+import routes.mailtime
