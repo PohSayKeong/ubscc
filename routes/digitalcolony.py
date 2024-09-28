@@ -38,7 +38,7 @@ def calculate_new_colony(current_colony, weight):
 
 def weights(colony, generations):
     current_colony = list(map(int, colony))
-    for i in range(generations):
+    for i in range(generations, 20):
         weight = sum(current_colony) % 10  # Modular arithmetic to keep weight small
         logging.info(f"Generation {i}, Weight: {weight}")
         new_colony = calculate_new_colony(current_colony, weight)
