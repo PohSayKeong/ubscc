@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 @app.route("/ub5-flags", methods=["POST"])
-def evaluate():
+def decode():
     return json.dumps(
         {
             "sanityScroll": {"flag": "UB5{dzNsYzBtM183MF9jN2ZfTjB0dHlCMDE=}"},
