@@ -4,29 +4,23 @@ from routes import app
 
 
 def calculate_max_efficiency(monsters):
-    n = len(monsters)
-    dp = [0] * (n + 1)  # dp[i] stores the maximum efficiency starting from time i
-    max_gold = 0
+    dp = {}
 
-    # Traverse backwards through the time steps to calculate the best decision at each point
-    for i in range(n - 1, -1, -1):
-        # If Kazuma prepares a circle at time i, he can attack at any future time j (j > i)
-        for j in range(i + 1, n):
-            attack_gain = max(
-                0, monsters[j] - monsters[i]
-            )  # Gain from attacking at time j
-            if j + 1 < n:
-                dp[i] = max(
-                    dp[i], attack_gain + dp[j + 1]
-                )  # Include future gains after cooldown
-            else:
-                dp[i] = max(
-                    dp[i], attack_gain
-                )  # No future steps after attacking at the last moment
-        # If Kazuma does nothing at this time, he just carries forward the next step's efficiency
-        dp[i] = max(dp[i], dp[i + 1])
+    def dfs(i, charged):
+        if i >= len(monsters):
+            return 0
+        if (i, charged) in dp:
+            return dp[(i, charged)]
 
-    return dp[0]
+        if charged:
+            ans = max(dfs(i + 2, False) + monsters[i], dfs(i + 1, True))
+        else:
+            ans = max(dfs(i + 1, False), dfs(i + 1, True) - monsters[i])
+
+        dp[(i, charged)] = ans
+        return ans
+
+    return dfs(0, False)
 
 
 @app.route("/efficient-hunter-kazuma", methods=["POST"])
