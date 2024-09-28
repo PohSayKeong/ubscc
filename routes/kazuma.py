@@ -3,31 +3,29 @@ import logging
 from routes import app
 
 
-def calculate_efficiency_dp(monsters):
+def calculate_max_efficiency(monsters):
     n = len(monsters)
+    dp = [0] * (n + 1)  # dp[i] stores the maximum efficiency starting from time i
+    max_gold = 0
 
-    if n == 0:
-        return 0
-    elif n == 1:
-        return 0  # Not enough time to prepare and attack
-
-    # DP array to store the maximum efficiency starting from each time frame
-    dp = [0] * (n + 1)
-
-    # Iterate from the end of the time frames to the beginning
-    for i in range(n - 2, -1, -1):
-        # Option 1: Skip this time frame
-        dp[i] = dp[i + 1]
-
-        # Option 2: Prepare a circle at time i, attack at time i+1, and rest at time i+2
-        if i + 1 < n:
-            profit = monsters[i + 1] - monsters[i]
-            if i + 3 < n:
-                dp[i] = max(dp[i], dp[i + 3] + profit)
+    # Traverse backwards through the time steps to calculate the best decision at each point
+    for i in range(n - 1, -1, -1):
+        # If Kazuma prepares a circle at time i, he can attack at any future time j (j > i)
+        for j in range(i + 1, n):
+            attack_gain = max(
+                0, monsters[j] - monsters[i]
+            )  # Gain from attacking at time j
+            if j + 1 < n:
+                dp[i] = max(
+                    dp[i], attack_gain + dp[j + 1]
+                )  # Include future gains after cooldown
             else:
-                dp[i] = max(dp[i], profit)
+                dp[i] = max(
+                    dp[i], attack_gain
+                )  # No future steps after attacking at the last moment
+        # If Kazuma does nothing at this time, he just carries forward the next step's efficiency
+        dp[i] = max(dp[i], dp[i + 1])
 
-    # Maximum efficiency is stored in dp[0]
     return dp[0]
 
 
@@ -39,7 +37,7 @@ def efficient_hunter_kazuma():
 
     for entry in data:
         monsters = entry["monsters"]
-        efficiency = calculate_efficiency_dp(monsters)
+        efficiency = calculate_max_efficiency(monsters)
         response.append({"efficiency": efficiency})
 
     return jsonify(response)
