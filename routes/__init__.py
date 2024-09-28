@@ -6,3 +6,4 @@ import routes.wordle
 import routes.kazuma
 import routes.lab_work
 import routes.bugfixer1
+import routes.bugfixer2
