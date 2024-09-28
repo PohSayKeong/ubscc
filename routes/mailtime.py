@@ -4,8 +4,6 @@ from datetime import datetime, timedelta
 import pytz
 from routes import app
 
-logger = logging.getLogger(__name__)
-
 
 def calculate_response_time(email1, email2):
     sent_time1 = datetime.fromisoformat(email1["timeSent"]).replace(tzinfo=pytz.UTC)
@@ -18,6 +16,7 @@ def calculate_response_time(email1, email2):
 @app.route("/mailtime", methods=["POST"])
 def mailtime():
     data = request.json
+    logging.info("data sent for evaluation {}".format(data))
     emails = data["emails"]
     users = data["users"]
 
