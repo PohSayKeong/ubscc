@@ -59,6 +59,7 @@ def get_guess(word_list, guess, evaluation):
 @app.route("/wordle-game", methods=["POST"])
 def wordle():
     data = request.get_json()
+    logging.info("data sent for evaluation {}".format(data))
     guessHistory = data.get("guessHistory")
     evaluationHistory = data.get("evaluationHistory")
 
@@ -67,6 +68,9 @@ def wordle():
         guess = "tales"
     else:
         filtered_words = narrow_search_space(word_list, guessHistory, evaluationHistory)
-        guess = random.choice(filtered_words)
+        if not filtered_words:
+            guess = random.choice(word_list)
+        else:
+            guess = random.choice(filtered_words)
 
     return json.dumps({"guess": guess})
