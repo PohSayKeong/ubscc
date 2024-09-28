@@ -1,42 +1,45 @@
 from flask import Flask, request, jsonify
-
+import logging
 from routes import app
 
 
-def calculate_efficiency(monsters):
+def calculate_efficiency_dp(monsters):
     n = len(monsters)
-    efficiency = 0
-    i = 0
 
-    while i < n:
-        # Kazuma prepares to attack only if it's beneficial
-        if monsters[i] > 0:
-            # Monsters at current time frame (protection cost is equal to monsters in this frame)
-            protection_cost = monsters[i]
+    if n == 0:
+        return 0
+    elif n == 1:
+        return max(0, monsters[0] - 1)
 
-            # Attack only if Kazuma gains more than the protection cost (defeating all monsters)
-            if protection_cost > 1:  # Minimum cost of 1 adventurer (cost >= 1)
-                efficiency += (
-                    protection_cost - 1
-                )  # Earns gold equivalent to (monsters - cost)
+    # DP array to store maximum efficiency up to each time frame
+    dp = [0] * n
 
-            # After attack, move to rear and recover for one time frame (i+1 is skipped)
-            i += 2
-        else:
-            # Move to next time frame if no monsters or no attack
-            i += 1
+    # Base cases
+    dp[0] = max(0, monsters[0] - 1)
+    if n > 1:
+        dp[1] = max(dp[0], monsters[1] - 1)
 
-    return efficiency
+    # Fill DP table using recurrence relation
+    for i in range(2, n):
+        # Option 1: Don't attack at time i, just carry over the previous efficiency
+        dp[i] = dp[i - 1]
+
+        # Option 2: Attack at time i, add monsters[i] - 1 and skip the next time frame
+        dp[i] = max(dp[i], dp[i - 2] + (monsters[i] - 1))
+
+    # Return the maximum efficiency at the last time frame
+    return dp[n - 1]
 
 
 @app.route("/efficient-hunter-kazuma", methods=["POST"])
 def efficient_hunter_kazuma():
     data = request.get_json()
+    logging.info("data sent for evaluation {}".format(data))
     response = []
 
     for entry in data:
         monsters = entry["monsters"]
-        efficiency = calculate_efficiency(monsters)
+        efficiency = calculate_efficiency_dp(monsters)
         response.append({"efficiency": efficiency})
 
     return jsonify(response)
